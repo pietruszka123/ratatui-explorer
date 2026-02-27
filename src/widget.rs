@@ -5,7 +5,9 @@ use ratatui::{
     layout::Rect,
     style::{Color, Style},
     text::{Line, Span, Text},
-    widgets::{Block, Borders, HighlightSpacing, List, ListState, WidgetRef},
+    widgets::{
+        Block, Borders, HighlightSpacing, List, ListState, StatefulWidget, Widget, WidgetRef,
+    },
 };
 
 use crate::{File, FileExplorer};
@@ -50,7 +52,16 @@ impl WidgetRef for Renderer<'_> {
             list = list.block(block);
         }
 
-        ratatui::widgets::StatefulWidgetRef::render_ref(&list, area, buf, &mut state);
+        StatefulWidget::render(list, area, buf, &mut state);
+    }
+}
+
+impl Widget for Renderer<'_> {
+    fn render(self, area: Rect, buf: &mut Buffer)
+    where
+        Self: Sized,
+    {
+        self.render_ref(area, buf);
     }
 }
 

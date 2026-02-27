@@ -1,6 +1,6 @@
 use std::{fs::FileType, io::Result, path::PathBuf};
 
-use ratatui::widgets::WidgetRef;
+use ratatui::widgets::{Widget, WidgetRef};
 
 use crate::{input::Input, widget::Renderer, Theme};
 
@@ -58,6 +58,18 @@ pub struct FileExplorer {
 }
 
 impl FileExplorer {
+    pub fn filter(&mut self, predicate: fn(&File) -> bool) {
+        let files_iter = self.files.clone().into_iter();
+        self.files = files_iter
+            .filter(|file: &File| {
+                if file.is_dir {
+                    return true;
+                }
+                predicate(file)
+            })
+            .collect();
+    }
+
     /// Creates a new instance of `FileExplorer`.
     ///
     /// This method initializes a `FileExplorer` with the current working directory.
@@ -147,7 +159,7 @@ impl FileExplorer {
     /// ```
     #[inline]
     #[must_use]
-    pub const fn widget(&self) -> impl WidgetRef + '_ {
+    pub const fn widget(&self) -> impl Widget + '_ {
         Renderer(self)
     }
 
